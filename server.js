@@ -1,105 +1,251 @@
 const express = require('express');
+const fs= require("fs");
+const staticfile = require("./jsonFiles/balanceSheet.json");
 const app = express();
 const port = 4000;
 const cors = require('cors');
+const { send } = require('process');
 app.use(cors());
 app.use(express.json());
 
+app.post('/signUp',(req,res)=>{
+    fs.readFile('./jsonFiles/signUp.json', 'utf-8',(error,data)=>{
+        if(error){
+            console.log(error);
+        }
+        else{
+            data = JSON.parse(data);
+            if(data[req.body.userName]){
+                
+                res.send({signUp:"user already present"});
+                return
+            }
+            data[req.body.userName] = req.body.password;
+            
+            fs.writeFile('./jsonFiles/signUp.json', JSON.stringify(data),(err)=>{
+                if(err){
+                    console.log('error while writing file:', err)
+                    res.send({signUp: false})
+                    return
+                }
+                res.send({signUp:true});
+            })
+            }
+    })
+
+    
+})
+
 app.post('/login', (req,res)=>{
+
     console.log(req.body.password);
-    if(req.body.username === "vikram" && req.body.password === '123')
-    {   
-        
-        res.send(JSON.stringify({login:true}))
-    }
-    else{
-        
-        res.send(JSON.stringify({login:false}))
-    }
+    fs.readFile('./jsonFiles/signUp.json', 'utf-8',(error,data)=>{
+        if(error){
+            console.log(error);
+            return;
+        }
+        if(data[req.body.username] === data[req.body.password])
+            {   
+                
+                res.send(JSON.stringify({login:true}))
+            }
+         else{
+                
+                res.send(JSON.stringify({login:false}))
+            }
+    })
+    
     
 });
 
 app.get('/recent-activity',(req,res)=>{
-    res.send(JSON.stringify([
-        {
-            id : 1,
-            task : "added",
-            type: "expense",
-            description : "Dinner",
-            image:"",
-            date:"12/01/2020",
-            day: "Monday",
-        },
-  
-        {
-            id : 2,
-            task : "Created",
-            type: "group",
-            description : "flat",
-            image:"",
-            date:"13/02/2020",
-            day: "Tuesday",
-        },
-        {
-            id : 3,
-            task : "deleted",
-            type: "group",
-            description : "flat",
-            image:"",
-            date:"14/02/2020",
-            day: "Wednesday",
+    fs.readFile('./jsonFiles/recent-activity.json','utf-8',(error,data)=>{
+        if(error){
+            console.log(error);
         }
-  
-    ]))
+        else{
+            res.send(data);
+        }
+    })
 })
 
 app.get('/friends',(req,res)=>{
-    res.send(JSON.stringify(["Rahul", "Swapnil", "Subham","sai"]))
-})
-app.get('/groups',(req,res)=>{
-    res.send(JSON.stringify(["Room Mates", "classmates"]))
-})
-app.get('/transitions',(req,res)=>{
-    res.send(JSON.stringify({
-        transNo: 1,
-        amount: 100,
-        members: ["vikram","subham","pandey"]
-      }))
-})
-app.get('/expenses',(req,res)=>{
-    res.send(JSON.stringify([
-        {   
-            id:1,
-            day:"05",
-            month:"MAY",
-            description:"Breakfast",
-            paid:"20.00",
-            lendTo:"Rahul",
-            lendAmound:"10.00"
-        },
-  
-        {
-            id: 2,
-            day:"07",
-            month:"DEC",
-            description:"lunch",
-            paid:"60.00",
-            lendTo:"Swapnil",
-            lendAmound:"30.00"
-        },
-        {
-            id : 3,
-            day:"05",
-            month:"MAY",
-            description:"Dinner",
-            paid:"20.00",
-            lendTo:"Rahul",
-            lendAmound:"10.00"
+    //res.send(JSON.stringify(["Rahul", "Swapnil", "Subham","sai"]))
+    fs.readFile('./jsonFiles/friends.json','utf-8',(err, jsonData)=>{
+        if(err){
+            console.log(err);
         }
-  
-    ]))
+        else{
+            res.send(jsonData);
+            
+        }
+    } )
 })
 
-app.get('/',(req,res) => res.send("hello express"));
+app.post('/add-friends',(req,res)=>{
+    fs.readFile('./jsonFiles/friends.json','utf-8',(err, data)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            data = JSON.parse(data);
+            
+            data.push(req.body.name);
+            
+            fs.writeFile('./jsonFiles/friends.json',JSON.stringify(data),(err=>{
+                if(err){
+                    console.log(err);
+                }
+                else{
+                    res.send("added")
+                }
+             }))
+            
+        }
+    } )
+})
 
-app.listen(port,()=> console.log("sdssd"));
+
+app.get('/groups',(req,res)=>{
+    //res.send(JSON.stringify(["Room Mates", "classmates"]))
+
+    fs.readFile('./jsonFiles/groups.json','utf-8',(error,data)=>{
+        if(error){
+            console.log(err);
+        }
+        else{
+            res.send(data);
+        }
+    })
+})
+
+app.get('/expenses',(req,res)=>{
+    
+    fs.readFile('./jsonFiles/expense.json','utf-8',(error,data)=>{
+        if(error){
+            console.log(error)
+        }
+        else{
+            res.send(data);
+        }
+    })
+})
+
+app.post('/add-transitions',(req,res)=>{
+    fs.readFile('./jsonFiles/addExpenses.json',(error,data)=>{
+        if(error){
+            console.log(error)
+        }
+        else{
+            data = JSON.parse(data);
+            data.push(req.body);
+            //console.log(data);
+            
+
+            fs.writeFile('./jsonFiles/addExpenses.json',JSON.stringify(data),(err)=>{
+                if(err){
+                    console.log(err);
+                }
+            })
+        }
+    })
+
+    fs.readFile("./jsonFiles/balanceSheet.json",(error,data)=>{
+        if(error){
+            console.log(error);
+        }
+        else{
+            data=JSON.parse(data);
+            let amount =0;
+            if(req.body.paidBy === 'you'){
+                if(req.body.friend in data){
+                    amount=data[req.body.friend] ;
+                    
+                }
+                amount = amount - (req.body.amount/2);
+                data[req.body.friend] = amount;
+            }
+            else{
+                    
+                if(req.body.friend in data){
+                    amount=data[req.body.friend] ;
+                        
+                    }
+                amount = amount + (req.body.amount/2)
+                data[req.body.friend] = amount;
+            }
+
+            fs.writeFile("./jsonFiles/balanceSheet.json",JSON.stringify(data),(err)=>{
+               if(err){
+                console.log(err);
+                return;
+               }
+               console.log("run");
+               res.send("updated");
+                
+
+
+            })
+            
+        }
+    })
+    
+})
+
+app.get('/transition-details',(req,res)=>{
+    let balance={
+        owe:{},
+        owed:{},
+        total:{}
+    }
+    fs.readFile("./jsonFiles/balanceSheet.json",(error,data)=>{
+        if(error){
+            console.log(error);
+        }
+        else{
+            data = JSON.parse(data);
+            balance.total = data;
+            for(const friend in data){
+                if(data[friend]>0){
+                    balance.owe[friend]=data[friend] *1;
+                }
+                else if(data[friend]<0){
+                    balance.owed[friend] = data[friend] * -1;
+                }
+            }
+
+           
+            res.send(balance);
+        }
+    });
+    
+})
+
+app.post('/settelUp',(req,res)=>{
+    console.log("api hit");
+    fs.readFile("./jsonFiles/balanceSheet.json",(error,data)=>{
+        if(error){
+            console.log(error);
+        }
+        else{
+            data = JSON.parse(data);
+            let amount = data[req.body.friend];
+            amount = amount - req.body.amount;
+            data[req.body.friend] = amount;
+            console.log(data);
+
+            fs.writeFile("./jsonFiles/balanceSheet.json", JSON.stringify(data),(err)=>{
+                if(err){
+                    console.log(err);
+                }
+                else{
+                    res.send("setteled");
+                }
+            })
+
+
+        }
+    })
+})
+
+app.listen(port,()=> console.log("server running"));

@@ -1,0 +1,31 @@
+[
+    {
+        "id" : 1,
+        "task" : "added",
+        "type": "expense",
+        "description" : "Dinner",
+        "image":"",
+        "date":"12/01/2020",
+        "day": "Monday"
+    },
+
+    {
+        "id" : 2,
+        "task" : "Created",
+       "type": "group",
+        "description" : "flat",
+        "image":"",
+        "date":"13/02/2020",
+        "day": "Tuesday"
+    },
+    {
+        "id" : 3,
+        "task" : "deleted",
+        "type": "group",
+        "description" : "flat",
+        "image":"",
+        "date":"14/02/2020",
+        "day": "Wednesday"
+    }
+
+]
