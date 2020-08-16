@@ -38,15 +38,17 @@ app.post('/signUp',(req,res)=>{
 
 app.post('/login', (req,res)=>{
 
-    console.log(req.body.password);
     fs.readFile('./jsonFiles/signUp.json', 'utf-8',(error,data)=>{
+        console.log(req.body);
         if(error){
             console.log(error);
             return;
         }
-        if(data[req.body.username] === data[req.body.password])
-            {   
-                
+        data = JSON.parse(data);
+        
+        if( req.body.username !== "" && data[req.body.username] === req.body.password)
+            {  console.log(data[req.body.username]);
+                console.log(req.body.password)
                 res.send(JSON.stringify({login:true}))
             }
          else{
@@ -89,7 +91,9 @@ app.post('/add-friends',(req,res)=>{
         }
         else{
             data = JSON.parse(data);
-            
+            if(data.find(element=> element === req.body.name)){
+                return
+            }
             data.push(req.body.name);
             
             fs.writeFile('./jsonFiles/friends.json',JSON.stringify(data),(err=>{
