@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/vikram1995/splitwise-backend#readme",
   "dependencies": {
-    "mocha": "^7.2.0",
+    "mocha": "^10.2.0",
     "mongoose": "^5.9.16"
   }
 }
